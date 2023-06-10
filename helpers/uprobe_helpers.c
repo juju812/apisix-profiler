@@ -14,6 +14,9 @@
 #include <errno.h>
 #include <limits.h>
 #include <gelf.h>
+#include "profile.h"
+
+extern struct profile_env env;
 
 #define warn(...) fprintf(stderr, __VA_ARGS__)
 
@@ -165,16 +168,24 @@ Elf *open_elf(const char *path, int *fd_close)
 {
 	int fd;
 	Elf *e;
+	char sym_path[strlen(env.symfs) + strlen(path) + 2];
 
 	if (elf_version(EV_CURRENT) == EV_NONE) {
 		warn("elf init failed\n");
 		return NULL;
 	}
-	fd = open(path, O_RDONLY);
+	
+	if (env.symfs) {
+		// join symfs and path
+		sprintf(sym_path, "%s/%s", env.symfs, path);
+	}
+
+	fd = open(sym_path, O_RDONLY);
 	if (fd < 0) {
-		warn("Could not open %s\n", path);
+		warn("Could not open %s\n", sym_path);
 		return NULL;
 	}
+
 	e = elf_begin(fd, ELF_C_READ, NULL);
 	if (!e) {
 		warn("elf_begin failed: %s\n", elf_errmsg(-1));

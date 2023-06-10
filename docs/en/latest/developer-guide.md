@@ -32,7 +32,7 @@ You may need `clang`, `libelf` and `zlib` to build the project, package names ma
 On `Ubuntu/Debian`, you need:
 
 ```sh
-$ apt install clang llvm libelf1 libelf-dev zlib1g-dev
+$ apt install clang llvm libelf1 libelf-dev zlib1g-dev pkg-config
 ```
 
 On `CentOS/Fedora`, you need:

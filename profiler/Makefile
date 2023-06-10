@@ -12,7 +12,9 @@ HELPERS := $(abspath ../helpers)
 # Use our own libbpf API headers and Linux UAPI headers distributed with
 # libbpf to avoid dependency on system-wide headers, which could be missing or
 # outdated
-INCLUDES := -I$(OUTPUT) -I../libbpf/include/uapi -I../vmlinux/$(ARCH) -I$(HELPERS)
+INCLUDE := $(abspath ../include)
+
+INCLUDES := -I$(OUTPUT) -I../libbpf/include/uapi -I../vmlinux/$(ARCH) -I$(INCLUDE) -I$(HELPERS) 
 CFLAGS := -g -Wall # -fsanitize=address
 
 APPS = profile
@@ -91,10 +93,10 @@ trace_helpers.o: $(HELPERS)/trace_helpers.c
 uprobe_helpers.o: $(HELPERS)/uprobe_helpers.c
 	$(Q)$(CC) $(CFLAGS) $(INCLUDES) -c $(filter %.c,$^) -o $@
 
-lua_stacks_map.o: lua_stacks_map.cpp profile.h lua_stacks_map.h
+lua_stacks_map.o: lua_stacks_map.cpp $(INCLUDE)/profile.h lua_stacks_map.h
 	$(CXX) $(CFLAGS) $(INCLUDES) -c $(filter %.cpp,$^) -o $@
 
-stack_printer.o: stack_printer.cpp profile.h stack_printer.h
+stack_printer.o: stack_printer.cpp $(INCLUDE)/profile.h stack_printer.h
 	$(CXX) $(CFLAGS) $(INCLUDES) -c $(filter %.cpp,$^) -o $@
 
 # Build application binary

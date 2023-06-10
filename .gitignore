@@ -1,3 +1,5 @@
+.idea
+.vscode
 profiler/.output/*
 profiler/*.o
 profiler/profile

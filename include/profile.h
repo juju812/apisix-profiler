@@ -2,6 +2,10 @@
 #ifndef __PROFILE_H
 #define __PROFILE_H
 
+#ifndef __CPLUSPLUS
+#include <stdbool.h>
+#endif
+
 #define TASK_COMM_LEN 16
 #define MAX_CPU_NR 128
 #define MAX_ENTRIES 10240
@@ -61,6 +65,7 @@ struct profile_env
 	bool folded;
 	int cpu;
 	int frame_depth;
+	char *symfs;
 };
 
 #endif /* __PROFILE_H */

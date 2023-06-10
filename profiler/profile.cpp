@@ -43,7 +43,8 @@ struct profile_env env = {
 	.freq = 1,
 	.sample_freq = 49,
 	.cpu = -1,
-	.frame_depth = 15
+	.frame_depth = 15,
+	.symfs = NULL,
 };
 
 #define UPROBE_SIZE 3
@@ -93,9 +94,9 @@ static const struct argp_option opts[] = {
 	{"perf-max-stack-depth", OPT_PERF_MAX_STACK_DEPTH,
 	 "PERF-MAX-STACK-DEPTH", 0, "the limit for both kernel and user stack traces (default 127)"},
 	{"max-frame-depth", 'D', "DEPTH", 0, "max frame depth for eBPF to travel in the stack (default 15)"},
+	{"symfs", 'S', "SYMFS", 0, "optional path to search for binaries and elf symbols"},
 	{"verbose", 'v', NULL, 0, "Verbose debug output"},
 	{NULL, 'h', NULL, OPTION_HIDDEN, "Show the full help"},
-	{},
 };
 
 static error_t parse_arg(int key, char *arg, struct argp_state *state)
@@ -169,6 +170,9 @@ static error_t parse_arg(int key, char *arg, struct argp_state *state)
 			fprintf(stderr, "invalid CPU: %s\n", arg);
 			argp_usage(state);
 		}
+		break;
+	case 'S':
+		env.symfs = arg;
 		break;
 	case OPT_PERF_MAX_STACK_DEPTH:
 		errno = 0;
