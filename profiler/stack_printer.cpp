@@ -324,10 +324,12 @@ void print_stack_trace(struct ksyms *ksyms, struct syms_cache *syms_cache,
 
                 if (stack_id_err(k->kern_stack_id))
                     printf(";[Missed Kernel Stack]");
-                for (std::size_t j = nr_kip - 1; j >= 0; j--)
-                {
-                    ksym = ksyms__map_addr(ksyms, kip[j]);
-                    printf(";%s", ksym ? ksym->name : "[unknown]");
+                if (nr_kip > 0) {
+                    for (std::size_t j = nr_kip - 1; j >= 0; j--)
+                    {
+                        ksym = ksyms__map_addr(ksyms, kip[j]);
+                        printf(";%s", ksym ? ksym->name : "[unknown]");
+                    }
                 }
             }
             printf(" %lld\n", v);

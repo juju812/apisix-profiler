@@ -48,6 +48,7 @@ struct profile_env env = {
 };
 
 #define UPROBE_SIZE 3
+#define MAX_PATH 256
 
 const char *argp_program_version = "profile 0.1";
 const char *argp_program_bug_address =
@@ -97,6 +98,7 @@ static const struct argp_option opts[] = {
 	{"symfs", 'S', "SYMFS", 0, "optional path to search for binaries and elf symbols"},
 	{"verbose", 'v', NULL, 0, "Verbose debug output"},
 	{NULL, 'h', NULL, OPTION_HIDDEN, "Show the full help"},
+	{},
 };
 
 static error_t parse_arg(int key, char *arg, struct argp_state *state)
@@ -294,8 +296,17 @@ attach_lua_func(const char *lua_path, const char *func_name, const bpf_program *
 		warn("could not find %s in %s\n", func_name, lua_path);
 		return NULL;
 	}
+
+	char sym_lua_path[strlen(env.symfs) + strlen(lua_path) + 2];
+	if (env.symfs) {
+		// join symfs and path
+		sprintf(sym_lua_path, "%s/%s", env.symfs, lua_path);
+	} else {
+		strcpy(sym_lua_path, lua_path);
+	}
+
 	struct bpf_link *link = bpf_program__attach_uprobe(prog, false,
-													   -1, lua_path, func_off);
+													   -1, sym_lua_path, func_off);
 	if (!link)
 	{
 		warn("failed to attach %s: %d\n", func_name, -errno);
@@ -306,7 +317,7 @@ attach_lua_func(const char *lua_path, const char *func_name, const bpf_program *
 
 static int attach_lua_uprobes(struct profile_bpf *obj, struct bpf_link *links[])
 {
-	char lua_path[128];
+	char lua_path[MAX_PATH];
 	if (env.pid)
 	{
 		int res = 0;

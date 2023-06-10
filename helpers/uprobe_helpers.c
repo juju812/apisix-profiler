@@ -168,16 +168,18 @@ Elf *open_elf(const char *path, int *fd_close)
 {
 	int fd;
 	Elf *e;
-	char sym_path[strlen(env.symfs) + strlen(path) + 2];
 
 	if (elf_version(EV_CURRENT) == EV_NONE) {
 		warn("elf init failed\n");
 		return NULL;
 	}
 	
+	char sym_path[strlen(env.symfs) + strlen(path) + 2];
 	if (env.symfs) {
 		// join symfs and path
 		sprintf(sym_path, "%s/%s", env.symfs, path);
+	} else {
+		strcpy(sym_path, path);
 	}
 
 	fd = open(sym_path, O_RDONLY);
