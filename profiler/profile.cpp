@@ -44,7 +44,7 @@ struct profile_env env = {
 	.sample_freq = 49,
 	.cpu = -1,
 	.frame_depth = 15,
-	.symfs = NULL,
+	.symfs = "",
 };
 
 #define UPROBE_SIZE 3
@@ -298,7 +298,7 @@ attach_lua_func(const char *lua_path, const char *func_name, const bpf_program *
 	}
 
 	char sym_lua_path[strlen(env.symfs) + strlen(lua_path) + 2];
-	if (env.symfs) {
+	if (env.symfs && strlen(env.symfs) > 0) {
 		// join symfs and path
 		sprintf(sym_lua_path, "%s/%s", env.symfs, lua_path);
 	} else {
@@ -484,8 +484,20 @@ int main(int argc, char **argv)
 	 * We'll get sleep interrupted when someone presses Ctrl-C (which will
 	 * be "handled" with noop by sig_handler).
 	 */
+
+	struct timespec deadline, current;
+	clock_gettime(CLOCK_MONOTONIC, &deadline);
+	deadline.tv_sec += env.duration;
+
 	while (!exiting)
 	{
+		// check deadline
+		clock_gettime(CLOCK_MONOTONIC, &current);
+		if (current.tv_sec > deadline.tv_sec)
+		{
+			exiting = 1;
+			break;
+		}
 		// print perf event to get stack trace
 		err = perf_buffer__poll(pb, PERF_POLL_TIMEOUT_MS);
 		if (err < 0 && err != -EINTR)

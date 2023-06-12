@@ -175,7 +175,7 @@ Elf *open_elf(const char *path, int *fd_close)
 	}
 	
 	char sym_path[strlen(env.symfs) + strlen(path) + 2];
-	if (env.symfs) {
+	if (env.symfs && strlen(env.symfs) > 0) {
 		// join symfs and path
 		sprintf(sym_path, "%s/%s", env.symfs, path);
 	} else {
